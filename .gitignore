@@ -1,0 +1,17 @@
+# Byte compiled and cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Venvs
+venv/
+env/
+
+# OS and editor stuff
+.DS_Store
+.vscode/
+.idea/
+
+# kafka logs or temps
+kafka-logs/
+zookeeper-logs/
