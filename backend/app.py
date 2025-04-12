@@ -3,7 +3,27 @@ import sys
 sys.path.insert(1,'../db')
 import db
 
-app = flask(__name__)
+from flask_cors import CORS
+from kafka import KafkaProducer
+import json
+
+app = Flask(__name__)
+CORS(app)
+
+producer = KafkaProducer(
+    bootstrap_servers='localhost:9092', #check host name
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+@app.route('/produce', methods=['POST'])
+def produce():
+    data = request.get_json()
+    message = data.get('message')
+    if not message:
+        return jsonify({'error': 'Message is required'}), 400
+
+    producer.send('messages', {'message': message})
+    return jsonify({'status': 'Message sent to Kafka'})
 
 @app.route('/messages', methods=['GET'])
 def get_messages():
@@ -12,7 +32,7 @@ def get_messages():
 
 @app.route('/messages', methods=['POST'])
 def add_messages():
-    data = request.get_json
+    data = request.get_json()
     content = data.get('content')
     db.insert_message(content)
     return jsonify({'status': 'Message added'}), 201
