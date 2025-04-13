@@ -27,6 +27,8 @@
     <button type="submit">Send</button>
   </form>
 
+  <button id= "delete-all">Delete ALl</button>
+
   <h2>Stored Messages</h2>
   <div id="messages"></div>
 
@@ -47,6 +49,7 @@
         body: JSON.stringify({ message })
       });
 
+      setTimeout(loadMessages, 800); //delay .8sec for db to catchup
       input.value = '';
       loadMessages();  // Refresh the list
     });
@@ -55,16 +58,69 @@
       const res = await fetch('http://localhost:5000/messages');
       const data = await res.json();
       messagesDiv.innerHTML = '';
+      
       data.forEach(msg => {
         const div = document.createElement('div');
         div.className = 'message';
-        div.textContent = msg.content;
+        
+        // Msg content
+        const content = document.createElement('p');
+        content.textContent = msg.content;
+        div.appendChild(content);
+
+        // Working Timestamp
+        const time = document.createElement('small');
+        time.textContent = `Posted at: ${new Date(msg.timestamp).toLocaleString()}`;
+        div.appendChild(time)
+
+        // add edit button 
+        //TODO DEBUG BY ADDING CONSOLE LOGS
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.style.marginLeft = '10px';
+        editButton.onclick = async() => {
+          const newContent = prompt('Edit message:', msg.content);
+          if(newContent) {
+            await fetch('http://localhost:5000/messages/${msg.id}', {
+              method: 'PUT',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({content: newContent})
+            });
+            loadMessages();
+          }
+        };
+        div.appendChild(editButton);
+
+
+        //add delete button
+         //TODO DEBUG BY ADDING CONSOLE LOGS
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.style.marginLeft = '5px';
+        deleteButton.onclick = async() =>{
+          await fetch('http://localhost:5000/messages/${msg.id}' , {
+            method: 'DELETE'
+          });
+          loadMessages();
+        };
+        div.appendChild(deleteButton);
         messagesDiv.appendChild(div);
       });
     }
 
+    document.getElementById('delete-all').addEventListener('click', async() => {
+      if(confirm('All messages will be deleted. Proceed?')) {
+        await fetch('http://localhost:5000/messages', {
+          method: 'DELETE'
+        });
+        loadMessages();
+      }
+    });
+
     // Initial load
     loadMessages();
+
+    setInterval(loadMessages, 2000)
   </script>
 </body>
 </html>

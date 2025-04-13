@@ -37,16 +37,21 @@ def add_messages():
     db.insert_message(content)
     return jsonify({'status': 'Message added'}), 201
 
-@app.route('/messages<int:id>', methods=['PUT'])
+@app.route('/messages/<int:id>', methods=['PUT'])
 def update(id):
     data = request.get_json()
     db.update_message(id, data['content'])
     return jsonify({'status' : 'Message updated'})
 
-@app.route('/messages<int:id>', methods=['DELETE'])
+@app.route('/messages/<int:id>', methods=['DELETE'])
 def delete(id):
     db.delete_message(id)
     return jsonify({'status': 'Message deleted'})
+
+@app.route('/messages', methods=['DELETE'])
+def delete_all_messages():
+    db.delete_all_messages()
+    return jsonify({'status': 'All messages deleted'})
 
 if __name__ == '__main__':
     app.run(debug = True)

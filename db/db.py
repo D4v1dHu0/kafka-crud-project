@@ -34,3 +34,9 @@ def delete_message(id):
         with conn.cursor() as cur:
             cur.execute("DELETE FROM messages WHERE id = %s;",(id,))
         conn.commit()
+        
+def delete_all_messages():
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM messages;")
+        conn.commit()
