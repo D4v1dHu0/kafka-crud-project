@@ -73,15 +73,14 @@
         time.textContent = `Posted at: ${new Date(msg.timestamp).toLocaleString()}`;
         div.appendChild(time)
 
-        // add edit button 
-        //TODO DEBUG BY ADDING CONSOLE LOGS
+        // Working Edit button
         const editButton = document.createElement('button');
         editButton.textContent = 'Edit';
         editButton.style.marginLeft = '10px';
         editButton.onclick = async() => {
           const newContent = prompt('Edit message:', msg.content);
           if(newContent) {
-            await fetch('http://localhost:5000/messages/${msg.id}', {
+            await fetch(`http://localhost:5000/messages/${msg.id}`, {
               method: 'PUT',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({content: newContent})
@@ -92,13 +91,12 @@
         div.appendChild(editButton);
 
 
-        //add delete button
-         //TODO DEBUG BY ADDING CONSOLE LOGS
+        //Working Delete button
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
         deleteButton.style.marginLeft = '5px';
         deleteButton.onclick = async() =>{
-          await fetch('http://localhost:5000/messages/${msg.id}' , {
+          await fetch(`http://localhost:5000/messages/${msg.id}` , {
             method: 'DELETE'
           });
           loadMessages();
