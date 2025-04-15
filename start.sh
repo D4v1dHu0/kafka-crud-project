@@ -1,13 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-echo "Starting DOcker services..."
-docker compose up -d
+# Navigate to project root
+cd "$(dirname "$0")"
 
-echo "Activating virtual environment..."
+# Activate virtual environment
 source venv/bin/activate
 
-echo "Starting Flask app..."
-gnome-terminal -- bash -c "source venv/bin/activate && cd backend && python app.py"
+# Start Docker
+echo "Starting Docker containers..."
+docker compose up -d
 
-echo "Starting Kafka consumer..."
-gnome-terminal -- bash -c "source venv/bin/activate && cd backend && python consumer.py"
+# Start Flask in new terminal
+gnome-terminal -- bash -c "cd backend && source ../venv/bin/activate && echo Starting Flask... && python app.py; exec bash" &
+
+# Start Kafka Consumer in another terminal
+gnome-terminal -- bash -c "cd backend && source ../venv/bin/activate && echo Starting Consumer... && python consumer.py; exec bash" &
+
+echo "All services are starting..."
+echo "Opening Webpage..."
+
+xdg-open frontend/index.html
